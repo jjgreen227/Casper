@@ -7,16 +7,12 @@ import static dev.casperbot.util.CasperConstants.CasperColors.*;
 public class CasperConstants {
 
     // Discord Misc.
-    public static final String TOKEN = "MTA3MDk3Njg5MzUwMDgwNTE0MQ.GwyjcE.rdBjTB-5H2CvGHPuaLHdOHtirqvOWOVZYqjGQ8";
+    public static final String TOKEN = "MTA3MDk3Njg5MzUwMDgwNTE0MQ.GsBoi_.4GoFfxxGxKPetaJjOzBpDHG2LJP2vkE0wLjlkY";
     public static final String GUILD_ID = "1046314738931482655";
     public static final String LOGGER = CYAN + "[Casper Logger] ";
 
     // Consolidate into one log method
     // that consists of all level data.
-
-    // Could we make a switch for each
-    // level and implement the print
-    // method from there?
 
     public static void info(String message) {
         System.out.println(LOGGER + WHITE + "[" + Level.INFO + "] " + message);
