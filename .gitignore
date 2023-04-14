@@ -1,6 +1,21 @@
 # Compiled class file
 *.class
 
+# Environmental Variable file
+*.env
+
+# IntelliJ IDEA
+.idea/
+
+# Build files
+build/
+out/
+target/
+dist/
+
+# We use maven!
+/build.xml
+
 # Log file
 *.log
 
@@ -22,4 +37,3 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
-src/main/java/dev/casperbot/util/CasperConstants.java

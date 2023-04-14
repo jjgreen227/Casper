@@ -1,9 +1,11 @@
 package dev.casperbot;
 
 import dev.casperbot.database.*;
+import dev.casperbot.handlers.*;
 import dev.casperbot.listeners.*;
 import dev.casperbot.util.*;
 import dev.casperbot.util.exc.*;
+import dev.casperbot.util.file.*;
 import lombok.*;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
@@ -35,9 +37,7 @@ public class Main {
     };
 
     private static void setup() {
-        // Insert configuration file setup here.
-        // Config needs to be setup in order for everything to work.
-        // Config config = new Config(this, "config");
+        CasperFile file = new CasperFile("config.yml");
         MySQLConnector connector = new MySQLConnector(new MySQLConnector.DatabaseToken(
                 "localhost", 3306, "bookstore", "root", "myboot23"));
         info("Attempting to find database connection...");
@@ -93,11 +93,11 @@ public class Main {
         try {
             builder.addEventListeners(
                     new CommandListener(),
-                    new MessageReceiveListener(),
+                    new AuditLogHandlers(),
                     new VoiceChannelListener(),
-                    new GuildUpdateListener(),
                     new HistoryListener(),
                     new RPS());
+//                    new GuildUpdateListener(),
         } catch (Exception e) {
             severe("Unable to register listeners!");
             e.printStackTrace();

@@ -7,7 +7,7 @@ import static dev.casperbot.util.CasperConstants.CasperColors.*;
 public class CasperConstants {
 
     // Discord Misc.
-    public static final String TOKEN = "MTA3MDk3Njg5MzUwMDgwNTE0MQ.GsBoi_.4GoFfxxGxKPetaJjOzBpDHG2LJP2vkE0wLjlkY";
+    public static String TOKEN = "Anonymous";
     public static final String GUILD_ID = "1046314738931482655";
     public static final String LOGGER = CYAN + "[Casper Logger] ";
 

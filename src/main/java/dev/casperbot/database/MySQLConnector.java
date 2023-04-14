@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.sql.*;
 
+@Getter
 public class MySQLConnector {
 
     private final DatabaseToken info; // This is a class that contains the database token information;
