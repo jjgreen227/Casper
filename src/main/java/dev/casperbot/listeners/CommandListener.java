@@ -51,9 +51,6 @@ public class CommandListener extends ListenerAdapter {
             case "shutdown" -> {
                 sendPrivateMessage(event.getUser(), "Shutting down...");
                 event.reply("Goodbye...").setEphemeral(true).queue();
-                Member member = (Member) Objects.requireNonNull(event.getMember()).getUser();
-                DiscordUser user = new DiscordUser(member.getId());
-                userManager.removeDiscordUserCache(user);
                 shutdown();
             }
             case "test" -> testEmbed(event);
@@ -90,7 +87,7 @@ public class CommandListener extends ListenerAdapter {
     }
 
     private void shutdown() {
-        Main.getApi().shutdown();
+        Main.api.shutdown();
     }
 
     private void reply(SlashCommandInteractionEvent event, String content, boolean ephemeral) {

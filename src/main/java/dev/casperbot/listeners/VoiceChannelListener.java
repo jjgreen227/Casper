@@ -1,6 +1,7 @@
 package dev.casperbot.listeners;
 
 import dev.casperbot.*;
+import dev.casperbot.util.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.*;
 import net.dv8tion.jda.api.entities.channel.unions.*;
@@ -28,13 +29,13 @@ public class VoiceChannelListener extends ListenerAdapter {
     }
 
     private void joinVoiceChannel(VoiceChannel channel) {
-        Guild guild = Main.getApi().getGuildById("1046314738931482655");
+        Guild guild = Main.api.getGuildById(CasperConstants.GUILD_ID);
         AudioManager audioManager = Objects.requireNonNull(guild).getAudioManager();
         audioManager.openAudioConnection(channel);
     }
 
     private void leaveChannel() {
-        Guild guild = Main.getApi().getGuildById("1046314738931482655");
+        Guild guild = Main.api.getGuildById(CasperConstants.GUILD_ID);
         AudioManager audioManager = Objects.requireNonNull(guild).getAudioManager();
         audioManager.closeAudioConnection();
     }
