@@ -3,6 +3,7 @@
 
 # Environmental Variable file
 *.env
+*.properties
 
 # IntelliJ IDEA
 .idea/
