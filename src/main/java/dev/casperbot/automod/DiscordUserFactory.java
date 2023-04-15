@@ -1,5 +1,7 @@
 package dev.casperbot.automod;
 
+import dev.casperbot.database.*;
+import dev.casperbot.util.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.member.*;
 import net.dv8tion.jda.api.hooks.*;
@@ -7,7 +9,7 @@ import net.dv8tion.jda.api.hooks.*;
 import java.util.*;
 
 public class DiscordUserFactory extends ListenerAdapter {
-    private Map<String, DiscordUser> discordUserMap = new HashMap<>();
+    private final Map<String, String> discordUserMap;
 
     public DiscordUserFactory() {
         this.discordUserMap = new HashMap<>();
@@ -15,25 +17,22 @@ public class DiscordUserFactory extends ListenerAdapter {
 
     public DiscordUserFactory(DiscordUser user) {
         this.discordUserMap = new HashMap<>();
-        addDiscordUser(user.getId(), user);
     }
 
-    public void addDiscordUser(String id, DiscordUser user) {
-        this.discordUserMap.put(id, user);
+    public void addDiscordUser(String id, String name) {
+        this.discordUserMap.put(id, name);
+        MySQLFactory.addDiscordUser(id, name);
+        CasperConstants.fine("Added user " + name + " to the database.");
     }
 
     public void removeDiscordUserCache(DiscordUser user) {
         this.discordUserMap.remove(user);
     }
 
-    public DiscordUser getUserId(String id) {
-        return this.discordUserMap.get(new DiscordUser(id));
-    }
-
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         final Member member = event.getMember();
-        DiscordUser dUser = new DiscordUser(member.getId());
-        addDiscordUser(member.getId(), dUser);
+        DiscordUser user = new DiscordUser(member.getId(), member.getEffectiveName());
+        addDiscordUser(user.getId(), user.getName());
     }
 }

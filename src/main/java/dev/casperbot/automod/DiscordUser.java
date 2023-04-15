@@ -18,7 +18,7 @@ public class DiscordUser {
     private List<Role> roles;
     private boolean isMuted, isTimed, isBanned;
 
-    public DiscordUser(String name, String id) {
+    public DiscordUser(String id, String name) {
         this.name = name;
         this.id = id;
         this.roles = new ArrayList<>();
@@ -28,7 +28,7 @@ public class DiscordUser {
     }
 
     public DiscordUser(String id) {
-        this("", id);
+        this(id, "");
         this.roles = new ArrayList<>();
         this.isMuted = false;
         this.isTimed = false;
