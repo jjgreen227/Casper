@@ -4,6 +4,7 @@ import dev.casperbot.util.*;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.*;
+import net.dv8tion.jda.api.events.channel.*;
 import net.dv8tion.jda.api.events.guild.member.*;
 import net.dv8tion.jda.api.events.message.*;
 
@@ -16,12 +17,6 @@ import java.time.format.*;
 *  This class will be used to handle all audit log events.
 */
 public class AuditLogHandlers extends Handler {
-
-    @Override
-    public void handle() {}
-
-    @Override
-    public void clear() {}
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {

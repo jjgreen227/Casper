@@ -1,32 +1,33 @@
 package dev.casperbot.util;
 
+import lombok.experimental.*;
+
 import java.util.logging.*;
 
 import static dev.casperbot.util.CasperConstants.CasperColors.*;
 
+@UtilityClass
 public class CasperConstants {
 
-    // Discord Misc.
-    public static String TOKEN = "Anonymous";
-    public static final String GUILD_ID = "1046314738931482655";
-    public static final String LOGGER = CYAN + "[Casper Logger] ";
+    public String GUILD_ID = "1095838889815572480"; // This is temporary. This will be changed to the actual guild IDs logged within SQL.
+    public String LOGGER = CYAN + "[Casper Logger] ";
 
     // Consolidate into one log method
     // that consists of all level data.
 
-    public static void info(String message) {
+    public void info(String message) {
         System.out.println(LOGGER + WHITE + "[" + Level.INFO + "] " + message);
     }
 
-    public static void severe(String message) {
+    public void severe(String message) {
         System.out.println(LOGGER + RED + "[" + Level.SEVERE + "] " + message);
     }
 
-    public static void warning(String message) {
+    public void warning(String message) {
         System.out.println(LOGGER + YELLOW + "[" + Level.WARNING + "] " + message);
     }
 
-    public static void fine(String message) {
+    public void fine(String message) {
         System.out.println(LOGGER + GREEN + "[" + Level.FINE + "] " + message);
     }
 

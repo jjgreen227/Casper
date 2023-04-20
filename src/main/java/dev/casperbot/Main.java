@@ -8,6 +8,7 @@ import dev.casperbot.util.*;
 import dev.casperbot.util.exc.*;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.*;
 import net.dv8tion.jda.api.interactions.commands.*;
 import net.dv8tion.jda.api.interactions.commands.build.*;
 import net.dv8tion.jda.api.requests.*;
@@ -16,6 +17,7 @@ import net.dv8tion.jda.api.utils.*;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
+import java.util.function.*;
 
 import static dev.casperbot.util.CasperConstants.*;
 import static net.dv8tion.jda.api.interactions.commands.build.Commands.slash;
@@ -98,31 +100,9 @@ public class Main {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        addRoleToEveryone();
         registerCommands();
-    }
-
-    private static void addRoleToEveryone() {
-        warning("Attempting to add a role to everyone...");
-        try {
-            Role role = api.getRoleById("1059342039042502736"); // Insert config option here.
-            if (role == null) throw new RoleNotFoundException(role.getName());
-            Guild guild = api.getGuildById(CasperConstants.GUILD_ID); // Insert config option here.
-            if (guild == null) throw new GuildNotFoundException("Unable to find guild with ID: " + CasperConstants.GUILD_ID);
-            List<Member> members = guild.getMembers();
-            members.forEach(member -> {
-                if (member.getUser().isBot()) return;
-                if (member.hasPermission(Permission.ADMINISTRATOR)) return; // Subject to change in the future.
-                if (!member.getRoles().contains(role)) {
-                    warning("Adding role to: " + member.getUser().getName());
-                    guild.addRoleToMember(member, role).queue();
-                }
-            });
-            fine("Successfully added roles to everyone.");
-        } catch (Exception e) {
-            severe("Unable to add role to everyone!");
-            throw new RuntimeException(e);
-        }
+        warning("Attempting to create channels...");
+        createChannels();
     }
 
     private static void registerListeners(JDABuilder builder) {
@@ -177,6 +157,65 @@ public class Main {
         }
         fine("Successfully registered all commands.");
     }
+
+    private static void createChannels() {
+        Guild guild = api.getGuildById(CasperConstants.GUILD_ID);
+        try {
+            if (guild == null) throw new GuildNotFoundException("Unable to find guild with ID: " + CasperConstants.GUILD_ID);
+            if (guild.getCategoriesByName("test", true).isEmpty()) {
+                severe("Unable to find category. Creating category...");
+                guild.createCategory("test").queue();
+                fine("Category has been created.");
+            } else {
+                fine("Category already exists.");
+            }
+            // TODO: Configure this to be a runnable task.
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    guild.getCategoriesByName("test", true).forEach(category -> {
+                        info("Creating channels within category...");
+                        category.createTextChannel("test").queue();
+                        category.createVoiceChannel("test").queue();
+                    });
+                }
+            });
+            thread.start();
+//            guild.getCategoriesByName("test", true).forEach(category -> {
+//                info("Creating channels within category...");
+//                category.createTextChannel("test").queue();
+//                category.createVoiceChannel("test").queue();
+//            });
+        } catch (GuildNotFoundException e) {
+            severe("Unable to create channels.");
+            throw new RuntimeException(e);
+        }
+        fine("Successfully created channels.");
+    }
+
+//    private static void addRoleToEveryone() {
+//        warning("Attempting to add a role to everyone...");
+//        try {
+//            Role role = api.getRoleById("1059342039042502736"); // Insert config option here.
+//            if (role == null) return;
+//            Guild guild = api.getGuildById(CasperConstants.GUILD_ID); // Insert config option here.
+//            if (guild == null) throw new GuildNotFoundException("Unable to find guild with ID: " + CasperConstants.GUILD_ID);
+//            List<Member> members = guild.getMembers();
+//            members.forEach(member -> {
+//                if (member.getUser().isBot()) return;
+//                if (member.hasPermission(Permission.ADMINISTRATOR)) return; // Subject to change in the future.
+//                if (!member.getRoles().contains(role)) {
+//                    warning("Adding role to: " + member.getUser().getName());
+//                    guild.addRoleToMember(member, role).queue();
+//                }
+//            });
+//            fine("Successfully added roles to everyone.");
+//        } catch (Exception e) {
+//            severe("Unable to add role to everyone!");
+//            throw new RuntimeException(e);
+//        }
+//        fine("Successfully added role to everyone.");
+//    }
 
     public static void main(String[] args) throws IOException, SQLException {
         setup();

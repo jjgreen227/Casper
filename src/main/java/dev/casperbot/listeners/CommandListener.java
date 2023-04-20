@@ -2,6 +2,7 @@ package dev.casperbot.listeners;
 
 import dev.casperbot.*;
 import dev.casperbot.automod.*;
+import dev.casperbot.util.*;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.middleman.*;
@@ -53,7 +54,7 @@ public class CommandListener extends ListenerAdapter {
                 event.reply("Goodbye...").setEphemeral(true).queue();
                 shutdown();
             }
-            case "test" -> testEmbed(event);
+            case "test" -> EmbedUtil.testEmbed(event.getGuildChannel().asTextChannel(), true);
             case "rps" -> {
                 RPS rps = new RPS();
                 rps.start(event);
