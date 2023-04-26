@@ -12,7 +12,7 @@ public class MySQLFactory {
         statement.executeUpdate();
     }
 
-    public static void addDiscordUser(String id, String name) {
+    public static void addDiscordUser(String id, String name) { // this is ugly, but it works...
         String query = "INSERT INTO discord_users (discord_id, discord_name) VALUES (?, ?)";
         try {
             PreparedStatement statement = Main.connector.getConnection().prepareStatement(query);

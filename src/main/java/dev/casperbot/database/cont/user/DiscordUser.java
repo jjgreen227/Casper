@@ -1,4 +1,4 @@
-package dev.casperbot.automod;
+package dev.casperbot.database.cont.user;
 
 import lombok.*;
 import net.dv8tion.jda.api.*;
@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.*;
 
 import java.awt.*;
+import java.time.format.*;
 import java.util.*;
 import java.util.List;
 
@@ -16,23 +17,17 @@ public class DiscordUser {
     private String name;
     private String id;
     private List<Role> roles;
-    private boolean isMuted, isTimed, isBanned;
+    private boolean isAdmin, isTimed, isBanned;
+    private String joinedDate;
 
     public DiscordUser(String id, String name) {
         this.name = name;
         this.id = id;
         this.roles = new ArrayList<>();
-        this.isMuted = false;
+        this.isAdmin = false;
         this.isTimed = false;
         this.isBanned = false;
-    }
-
-    public DiscordUser(String id) {
-        this(id, "");
-        this.roles = new ArrayList<>();
-        this.isMuted = false;
-        this.isTimed = false;
-        this.isBanned = false;
+        this.joinedDate = String.valueOf(new Date(DateTimeFormatter.ofPattern("MM/dd/yyyy").format(new Date().toInstant()))); // Amurica format lol...
     }
 
     public void info(SlashCommandInteractionEvent event, Member member) {
@@ -51,12 +46,6 @@ public class DiscordUser {
             builder.setImage(member.getEffectiveAvatarUrl());
             event.replyEmbeds(builder.build()).queue();
         }
-    }
-
-    public void showCache(SlashCommandInteractionEvent event) {
-        // Cached users go here.
-
-        event.reply("Cached Users: ").setEphemeral(true).queue();
     }
 
     private String getFormattedPermissions(Member member) {
@@ -92,13 +81,13 @@ public class DiscordUser {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof final DiscordUser that)) return false;
-        return isMuted() == that.isMuted() && isTimed() == that.isTimed() && isBanned() == that.isBanned() && Objects.equals(getName(), that.getName()) && Objects.equals(getId(), that.getId()) && Objects.equals(getRoles(), that.getRoles());
+        if (!(o instanceof final DiscordUser user)) return false;
+        return isAdmin() == user.isAdmin() && isTimed() == user.isTimed() && isBanned() == user.isBanned() && Objects.equals(getName(), user.getName()) && Objects.equals(getId(), user.getId()) && Objects.equals(getRoles(), user.getRoles()) && Objects.equals(getJoinedDate(), user.getJoinedDate());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getId(), getRoles(), isMuted(), isTimed(), isBanned());
+        return Objects.hash(getName(), getId(), getRoles(), isAdmin(), isTimed(), isBanned(), getJoinedDate());
     }
 
     @Override
@@ -107,9 +96,10 @@ public class DiscordUser {
                 "name='" + name + '\'' +
                 ", id='" + id + '\'' +
                 ", roles=" + roles +
-                ", isMuted=" + isMuted +
+                ", isAdmin=" + isAdmin +
                 ", isTimed=" + isTimed +
                 ", isBanned=" + isBanned +
+                ", joinedDate='" + joinedDate + '\'' +
                 '}';
     }
 }

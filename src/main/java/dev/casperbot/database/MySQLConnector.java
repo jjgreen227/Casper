@@ -12,12 +12,13 @@ public class MySQLConnector {
 
     public MySQLConnector(DatabaseToken info) {
         this.info = info;
-    }
-
-    public void connect() throws SQLException {
-        this.connection = DriverManager.getConnection(
-                "jdbc:mysql://" + info.getHost() + ":" + info.getPort() + "/" + info.getDatabaseName(),
-                info.getUsername(), info.getPassword());
+        try {
+            this.connection = DriverManager.getConnection(
+                    "jdbc:mysql://" + info.getHost() + ":" + info.getPort() + "/" + info.getDatabaseName(),
+                    info.getUsername(), info.getPassword());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Getter

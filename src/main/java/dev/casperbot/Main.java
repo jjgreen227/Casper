@@ -1,7 +1,7 @@
 package dev.casperbot;
 
-import dev.casperbot.automod.*;
 import dev.casperbot.database.*;
+import dev.casperbot.database.cont.user.*;
 import dev.casperbot.handlers.*;
 import dev.casperbot.listeners.*;
 import dev.casperbot.util.*;
@@ -9,7 +9,6 @@ import dev.casperbot.util.exc.*;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.interactions.commands.*;
-import net.dv8tion.jda.api.interactions.commands.build.*;
 import net.dv8tion.jda.api.requests.*;
 import net.dv8tion.jda.api.utils.*;
 
@@ -36,7 +35,25 @@ public class Main {
             GatewayIntent.GUILD_VOICE_STATES
     };
 
-    private static void setup() throws IOException, SQLException {
+    // TODO: Make this cleaner please. It hurts everyone's eyes.
+    /**
+     * This is the init method. This method is called when the bot is started.
+     *
+     * It will find a properties file, if not created then it will create and load properties.
+     * Once properties are loaded, it will connect to the database.
+     * If the database connection fails, it will throw an exception.
+     *
+     * Once database has been connected then it will start to execute
+     * any methods that need to be executed.
+     *
+     * JDA methods start to execute here after database connection and method implementation.
+     *
+     *
+     * @throws IOException
+     * @throws SQLException
+     * @throws InterruptedException
+     */
+    private static void init() throws IOException, SQLException, InterruptedException {
         /*
             * This is the setup method. This method is called when the bot is started.
             * This method will load the config.properties file, and then connect to the database.
@@ -46,7 +63,6 @@ public class Main {
             * This also looks very messy, but it's just a bunch of try-catch blocks.
             * There definitely will be a better way to do this in the future.
         */
-
         File file = new File("config.properties");
         if (!file.exists()) {
             CasperConstants.warning("File config.properties does not exist. Creating file...");
@@ -70,34 +86,27 @@ public class Main {
         String database = properties.getProperty("database");
         String username = properties.getProperty("username");
         String password = properties.getProperty("password");
+        warning("Attempting to find database connection...");
         connector = new MySQLConnector(new MySQLConnector.DatabaseToken(
                 host,
                 port,
                 database,
                 username,
                 password));
-        warning("Attempting to find database connection...");
-        try {
-            connector.connect();
-            fine("Successfully connected to database.");
-        } catch (SQLException e) {
-            severe("Unable to connect to database!");
-            throw new RuntimeException(e);
-        }
+        fine("Successfully connected to database.");
         MySQLFactory.createTable();
+
+        // Everything above these needs a cleanup.
+
         JDABuilder jdaBuilder = JDABuilder.createDefault(token, Arrays.asList(allIntents));
-        jdaBuilder.setActivity(Activity.streaming("IntelliJ Code", "https://www.twitch.tv/jayboy329"));
+        jdaBuilder.setActivity(Activity.streaming("IntelliJ Code", "https://www.twitch.tv/jayboy329")); // This is trolls and will be changed.
         jdaBuilder.setMemberCachePolicy(MemberCachePolicy.ALL);
         jdaBuilder.setChunkingFilter(ChunkingFilter.ALL);
         jdaBuilder.setBulkDeleteSplittingEnabled(false);
         registerListeners(jdaBuilder);
         api = jdaBuilder.build();
         fine("Successfully built JDA instance.");
-        try {
-            api.awaitReady();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        api.awaitReady();
         registerCommands();
         createLogs();
     }
@@ -107,12 +116,10 @@ public class Main {
         try {
             builder.addEventListeners(
                     new CommandListener(),
-                    new DiscordUserFactory(),
                     new AuditLogHandlers(),
                     new VoiceChannelListener(),
                     new HistoryListener(),
                     new RPS());
-//                    new GuildUpdateListener(),
         } catch (Exception e) {
             severe("Unable to register listeners!");
             e.printStackTrace();
@@ -124,21 +131,21 @@ public class Main {
     private static void registerCommands() {
         warning("Registering Commands...");
         try {
-            final SlashCommandData ping = slash("ping", "Ping");
-            final SlashCommandData shutdown = slash("shutdown", "Shuts down the bot (hopefully in a fast manner)")
+            var ping = slash("ping", "Ping");
+            var shutdown = slash("shutdown", "Shuts down the bot (hopefully in a fast manner)")
                     .setGuildOnly(true)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR));
-            final SlashCommandData clearchat = slash("clearchat", "Purges a certain amount of chat lines.")
+            var clearchat = slash("clearchat", "Purges a certain amount of chat lines.")
                     .addOption(OptionType.INTEGER, "lines", "Clears how many lines we can get.", false)
                     .setGuildOnly(true)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR));
-            final SlashCommandData info = slash("info", "Printing User Information")
+            var info = slash("info", "Printing User Information")
                     .addOption(OptionType.USER, "user", "User information", true)
                     .setGuildOnly(true);
-            final SlashCommandData test = slash("test", "Testing out embed for EmbedBuilder")
+            var test = slash("test", "Testing out embed for EmbedBuilder")
                     .setGuildOnly(true)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR));
-            final SlashCommandData rps = slash("rps", "Rock Paper Scissors...Shoot!");
+            var rps = slash("rps", "Rock Paper Scissors...Shoot!");
             api.updateCommands().addCommands(
                     ping,
                     shutdown,
@@ -178,7 +185,7 @@ public class Main {
             throw new RuntimeException(e);
         }
     }
-    public static void main(String[] args) throws IOException, SQLException {
-        setup();
+    public static void main(String[] args) throws IOException, SQLException, InterruptedException {
+        init();
     }
 }

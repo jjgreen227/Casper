@@ -1,7 +1,7 @@
 package dev.casperbot.listeners;
 
 import dev.casperbot.*;
-import dev.casperbot.automod.*;
+import dev.casperbot.database.cont.user.*;
 import dev.casperbot.util.*;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
@@ -22,15 +22,8 @@ public class CommandListener extends ListenerAdapter {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         MessageChannel messageChannel = event.getMessageChannel();
         MessageHistory history = messageChannel.getHistory();
-        DiscordUserFactory userManager = new DiscordUserFactory();
 
         switch (event.getName()) {
-            case "cache" -> {
-                Member member = event.getMember();
-                assert member != null;
-                DiscordUser user = new DiscordUser(member.getId());
-                user.showCache(event);
-            }
             case "ping" -> {
                 long ping = System.currentTimeMillis() - System.currentTimeMillis();
                 event.reply("Ping")
@@ -46,7 +39,7 @@ public class CommandListener extends ListenerAdapter {
             case "info" -> {
                 Member member = Objects.requireNonNull(event.getOption("user")).getAsMember();
                 if (member == null) return;
-                DiscordUser user = new DiscordUser(member.getId());
+                DiscordUser user = new DiscordUser(member.getId(), member.getEffectiveName());
                 user.info(event, member);
             }
             case "shutdown" -> {
