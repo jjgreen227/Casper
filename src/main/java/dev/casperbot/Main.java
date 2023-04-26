@@ -1,27 +1,32 @@
 package dev.casperbot;
 
-import dev.casperbot.automod.*;
-import dev.casperbot.database.*;
-import dev.casperbot.handlers.*;
-import dev.casperbot.listeners.*;
-import dev.casperbot.util.*;
-import dev.casperbot.util.exc.*;
-import net.dv8tion.jda.api.*;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.interactions.commands.*;
-import net.dv8tion.jda.api.interactions.commands.build.*;
-import net.dv8tion.jda.api.requests.*;
-import net.dv8tion.jda.api.utils.*;
+import dev.casperbot.database.MySQLConnector;
+import dev.casperbot.database.MySQLFactory;
+import dev.casperbot.handlers.AuditLogHandlers;
+import dev.casperbot.listeners.CommandListener;
+import dev.casperbot.listeners.HistoryListener;
+import dev.casperbot.listeners.VoiceChannelListener;
+import dev.casperbot.util.CasperConstants;
+import dev.casperbot.util.FileSetup;
+import dev.casperbot.util.exc.GuildNotFoundException;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
-import java.io.*;
-import java.sql.*;
-import java.util.*;
+import java.sql.SQLException;
+import java.util.Arrays;
 
 import static dev.casperbot.util.CasperConstants.*;
 import static net.dv8tion.jda.api.interactions.commands.build.Commands.slash;
 
 public class Main {
-
     public static JDA api;
     public static MySQLConnector connector;
 
@@ -36,40 +41,22 @@ public class Main {
             GatewayIntent.GUILD_VOICE_STATES
     };
 
-    // TODO: Make this cleaner please. It hurts everyone's eyes.
     /**
      * This is the init method. This method is called when the bot is started.
-     *
+     * <p>
      * It will find a properties file, if not created then it will create and load properties.
      * Once properties are loaded, it will connect to the database.
      * If the database connection fails, it will throw an exception.
-     *
+     * <p>
      * Once database has been connected then it will start to execute
      * any methods that need to be executed.
-     *
+     * <p>
      * JDA methods start to execute here after database connection and method implementation.
      *
-     *
-     * @throws IOException
      * @throws SQLException
      * @throws InterruptedException
      */
-    private static void init() throws IOException, SQLException, InterruptedException {
-        /*
-            * This is the setup method. This method is called when the bot is started.
-            * This method will load the config.properties file, and then connect to the database.
-            * If the file does not exist, it will create the file.
-            * If the database connection fails, it will throw an exception.
-    /*
-     * This is the setup method. This method is called when the bot is started.
-     * This method will load the config.properties file, and then connect to the database.
-     * If the file does not exist, it will create the file.
-     * If the database connection fails, it will throw an exception.
-
-     * This also looks very messy, but it's just a bunch of try-catch blocks.
-     * There definitely will be a better way to do this in the future.
-     */
-    private static void init() throws IOException, SQLException, InterruptedException {
+    private static void init() throws SQLException, InterruptedException {
         FileSetup fileSetup = new FileSetup("config.properties");
         fileSetup.setup();
         fileSetup.setupReader();
@@ -106,12 +93,10 @@ public class Main {
         try {
             builder.addEventListeners(
                     new CommandListener(),
-                    new DiscordUserFactory(),
                     new AuditLogHandlers(),
                     new VoiceChannelListener(),
                     new HistoryListener(),
                     new RPS());
-//                    new GuildUpdateListener(),
         } catch (Exception e) {
             severe("Unable to register listeners!");
             e.printStackTrace();
@@ -157,7 +142,8 @@ public class Main {
     private static void createLogs() {
         Guild guild = api.getGuildById(CasperConstants.GUILD_ID);
         try {
-            if (guild == null) throw new GuildNotFoundException("Unable to find guild with ID: " + CasperConstants.GUILD_ID);
+            if (guild == null)
+                throw new GuildNotFoundException("Unable to find guild with ID: " + CasperConstants.GUILD_ID);
             if (guild.getCategoriesByName("test", true).isEmpty()) {
                 severe("Unable to find support category. Creating category...");
                 guild.createCategory("test").queue();
@@ -177,7 +163,8 @@ public class Main {
             throw new RuntimeException(e);
         }
     }
-    public static void main(String[] args) throws IOException, SQLException, InterruptedException {
+
+    public static void main(String[] args) throws SQLException, InterruptedException {
         init();
     }
 }

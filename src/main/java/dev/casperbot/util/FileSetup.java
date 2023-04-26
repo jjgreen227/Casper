@@ -7,9 +7,9 @@ import java.util.Properties;
 
 @Getter
 public class FileSetup {
+    private final String fileName;
 
     private File file;
-    private String fileName;
     private Properties properties;
 
     public String host;
