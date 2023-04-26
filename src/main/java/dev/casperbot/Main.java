@@ -36,6 +36,30 @@ public class Main {
             GatewayIntent.GUILD_VOICE_STATES
     };
 
+    // TODO: Make this cleaner please. It hurts everyone's eyes.
+    /**
+     * This is the init method. This method is called when the bot is started.
+     *
+     * It will find a properties file, if not created then it will create and load properties.
+     * Once properties are loaded, it will connect to the database.
+     * If the database connection fails, it will throw an exception.
+     *
+     * Once database has been connected then it will start to execute
+     * any methods that need to be executed.
+     *
+     * JDA methods start to execute here after database connection and method implementation.
+     *
+     *
+     * @throws IOException
+     * @throws SQLException
+     * @throws InterruptedException
+     */
+    private static void init() throws IOException, SQLException, InterruptedException {
+        /*
+            * This is the setup method. This method is called when the bot is started.
+            * This method will load the config.properties file, and then connect to the database.
+            * If the file does not exist, it will create the file.
+            * If the database connection fails, it will throw an exception.
     /*
      * This is the setup method. This method is called when the bot is started.
      * This method will load the config.properties file, and then connect to the database.
@@ -99,21 +123,21 @@ public class Main {
     private static void registerCommands() {
         warning("Registering Commands...");
         try {
-            final SlashCommandData ping = slash("ping", "Ping");
-            final SlashCommandData shutdown = slash("shutdown", "Shuts down the bot (hopefully in a fast manner)")
+            var ping = slash("ping", "Ping");
+            var shutdown = slash("shutdown", "Shuts down the bot (hopefully in a fast manner)")
                     .setGuildOnly(true)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR));
-            final SlashCommandData clearchat = slash("clearchat", "Purges a certain amount of chat lines.")
+            var clearchat = slash("clearchat", "Purges a certain amount of chat lines.")
                     .addOption(OptionType.INTEGER, "lines", "Clears how many lines we can get.", false)
                     .setGuildOnly(true)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR));
-            final SlashCommandData info = slash("info", "Printing User Information")
+            var info = slash("info", "Printing User Information")
                     .addOption(OptionType.USER, "user", "User information", true)
                     .setGuildOnly(true);
-            final SlashCommandData test = slash("test", "Testing out embed for EmbedBuilder")
+            var test = slash("test", "Testing out embed for EmbedBuilder")
                     .setGuildOnly(true)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR));
-            final SlashCommandData rps = slash("rps", "Rock Paper Scissors...Shoot!");
+            var rps = slash("rps", "Rock Paper Scissors...Shoot!");
             api.updateCommands().addCommands(
                     ping,
                     shutdown,
