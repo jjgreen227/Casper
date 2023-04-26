@@ -1,8 +1,12 @@
 package dev.casperbot.database;
 
-import lombok.*;
+import lombok.Getter;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+import static dev.casperbot.util.CasperConstants.*;
 
 @Getter
 public class MySQLConnector {
@@ -14,10 +18,17 @@ public class MySQLConnector {
         this.info = info;
     }
 
-    public void connect() throws SQLException {
-        this.connection = DriverManager.getConnection(
-                "jdbc:mysql://" + info.getHost() + ":" + info.getPort() + "/" + info.getDatabaseName(),
-                info.getUsername(), info.getPassword());
+    public void connect()  {
+        warning("Attempting to find database connection...");
+        try {
+            this.connection = DriverManager.getConnection(
+                    "jdbc:mysql://" + info.getHost() + ":" + info.getPort() + "/" + info.getDatabaseName(),
+                    info.getUsername(), info.getPassword());
+            fine("Successfully connected to database.");
+        } catch (SQLException e) {
+            severe("Unable to connect to database!");
+            throw new RuntimeException(e);
+        }
     }
 
     @Getter

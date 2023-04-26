@@ -36,55 +36,34 @@ public class Main {
             GatewayIntent.GUILD_VOICE_STATES
     };
 
-    private static void setup() throws IOException, SQLException {
-        /*
-            * This is the setup method. This method is called when the bot is started.
-            * This method will load the config.properties file, and then connect to the database.
-            * If the file does not exist, it will create the file.
-            * If the database connection fails, it will throw an exception.
+    /*
+     * This is the setup method. This method is called when the bot is started.
+     * This method will load the config.properties file, and then connect to the database.
+     * If the file does not exist, it will create the file.
+     * If the database connection fails, it will throw an exception.
 
-            * This also looks very messy, but it's just a bunch of try-catch blocks.
-            * There definitely will be a better way to do this in the future.
-        */
-
-        File file = new File("config.properties");
-        if (!file.exists()) {
-            CasperConstants.warning("File config.properties does not exist. Creating file...");
-            try {
-                file.createNewFile();
-                CasperConstants.fine("Created file");
-            } catch (IOException e) {
-                e.printStackTrace();
-                CasperConstants.severe("Failed to create file");
-            }
-        } else {
-            CasperConstants.fine("File config.properties has been loaded.");
-        }
-        FileReader reader = new FileReader(file);
-        BufferedReader bufferedReader = new BufferedReader(reader);
-        Properties properties = new Properties();
-        properties.load(bufferedReader);
-        String token = properties.getProperty("token");
-        String host = properties.getProperty("host");
-        int port = Integer.parseInt(properties.getProperty("port"));
-        String database = properties.getProperty("database");
-        String username = properties.getProperty("username");
-        String password = properties.getProperty("password");
+     * This also looks very messy, but it's just a bunch of try-catch blocks.
+     * There definitely will be a better way to do this in the future.
+     */
+    private static void init() throws IOException, SQLException, InterruptedException {
+        FileSetup fileSetup = new FileSetup("config.properties");
+        fileSetup.setup();
+        fileSetup.setupReader();
+        String host = fileSetup.getHost();
+        int port = fileSetup.getPort();
+        String database = fileSetup.getDatabase();
+        String username = fileSetup.getUsername();
+        String password = fileSetup.getPassword();
+        String token = fileSetup.getToken();
         connector = new MySQLConnector(new MySQLConnector.DatabaseToken(
                 host,
                 port,
                 database,
                 username,
                 password));
-        warning("Attempting to find database connection...");
-        try {
-            connector.connect();
-            fine("Successfully connected to database.");
-        } catch (SQLException e) {
-            severe("Unable to connect to database!");
-            throw new RuntimeException(e);
-        }
+        connector.connect();
         MySQLFactory.createTable();
+        warning("Attempting to build JDA instance...");
         JDABuilder jdaBuilder = JDABuilder.createDefault(token, Arrays.asList(allIntents));
         jdaBuilder.setActivity(Activity.streaming("IntelliJ Code", "https://www.twitch.tv/jayboy329"));
         jdaBuilder.setMemberCachePolicy(MemberCachePolicy.ALL);
@@ -92,12 +71,8 @@ public class Main {
         jdaBuilder.setBulkDeleteSplittingEnabled(false);
         registerListeners(jdaBuilder);
         api = jdaBuilder.build();
+        api.awaitReady();
         fine("Successfully built JDA instance.");
-        try {
-            api.awaitReady();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         registerCommands();
         createLogs();
     }
@@ -178,7 +153,7 @@ public class Main {
             throw new RuntimeException(e);
         }
     }
-    public static void main(String[] args) throws IOException, SQLException {
-        setup();
+    public static void main(String[] args) throws IOException, SQLException, InterruptedException {
+        init();
     }
 }
