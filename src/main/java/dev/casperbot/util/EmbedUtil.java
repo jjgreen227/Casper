@@ -21,6 +21,17 @@ public class EmbedUtil {
         channel.sendTyping().queue(voided -> channel.sendMessageEmbeds(embedBuilder.build()).queue());
     }
 
+    public void guildInfoEmbed(TextChannel channel, String name, String id, String owner, int members) {
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setTitle("Guild Information");
+        builder.setColor(Color.DARK_GRAY);
+        builder.addField("Guild Name", name, true);
+        builder.addField("Guild ID", id, true);
+        builder.addField("Guild Owner", owner, true);
+        builder.addField("Guild Members", String.valueOf(members), true);
+        channel.sendTyping().queue(voided -> channel.sendMessageEmbeds(builder.build()).queue());
+    }
+
     public void testEmbed(TextChannel channel, boolean isCommand) {
         SlashCommandInteractionEvent event = null;
         if (isCommand) {

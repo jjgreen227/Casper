@@ -1,9 +1,9 @@
 package dev.casperbot.listeners;
 
 import dev.casperbot.*;
+import dev.casperbot.database.cont.guild.*;
 import dev.casperbot.database.cont.user.*;
 import dev.casperbot.util.*;
-import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.middleman.*;
 import net.dv8tion.jda.api.events.interaction.command.*;
@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.interactions.commands.*;
 import net.dv8tion.jda.api.requests.*;
 import org.jetbrains.annotations.*;
 
-import java.awt.*;
 import java.util.*;
 
 public class CommandListener extends ListenerAdapter {
@@ -24,6 +23,16 @@ public class CommandListener extends ListenerAdapter {
         MessageHistory history = messageChannel.getHistory();
 
         switch (event.getName()) {
+            case "guild" -> {
+                // Fetch guild information from database and list them in an embed.
+                Guild guild = event.getGuild();
+                if (guild == null) return;
+                String id = guild.getId();
+                CasperGuild casperGuild = CasperGuildManager.getInstance().getGuild(id);
+                if (casperGuild == null) return;
+                casperGuild.info(event);
+                event.reply("Guild info").setEphemeral(true).queue();
+            }
             case "ping" -> {
                 long ping = System.currentTimeMillis() - System.currentTimeMillis();
                 event.reply("Ping")
@@ -34,12 +43,12 @@ public class CommandListener extends ListenerAdapter {
             case "clearchat" -> {
                 int option = event.getOption("lines", 1, OptionMapping::getAsInt);
                 history.retrievePast(option).queue((messages -> event.getChannel().purgeMessages(messages)));
-                reply(event, "Successfully cleared chat.", true);
+                event.reply(history.size() + " messages deleted.").setEphemeral(true).queue();
             }
             case "info" -> {
                 Member member = Objects.requireNonNull(event.getOption("user")).getAsMember();
                 if (member == null) return;
-                DiscordUser user = new DiscordUser(member.getId(), member.getEffectiveName());
+                CasperUser user = new CasperUser(member.getId(), member.getEffectiveName());
                 user.info(event, member);
             }
             case "shutdown" -> {
@@ -56,24 +65,6 @@ public class CommandListener extends ListenerAdapter {
         }
     }
 
-    private void testEmbed(SlashCommandInteractionEvent event) {
-        EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle("Test Embed");
-        builder.setAuthor("Casper", "https://i.imgur.com/pP4MHTW.png", "https://i.imgur.com/pP4MHTW.png");
-        builder.setDescription("This is a test embed.");
-        builder.addField("Field 1", "This is field 1.", true);
-        builder.addField("Field 2", "This is field 2.", true);
-        builder.addField("Field 3", "This is field 3.", true);
-        builder.addField("Field 4", "This is field 4.", true);
-        builder.addField("Field 5", "This is field 5.", true);
-        builder.setImage("https://i.imgur.com/pP4MHTW.png");
-        builder.setColor(Color.GREEN);
-        builder.setThumbnail("https://i.imgur.com/pP4MHTW.png");
-        builder.setFooter("Footer");
-        builder.setTimestamp(new Date().toInstant());
-        event.replyEmbeds(builder.build()).setEphemeral(true).queue();
-    }
-
     private void sendPrivateMessage(User user, String content) {
         user.openPrivateChannel().flatMap(privateChannel -> privateChannel.sendMessage(content))
                 .queue(null, new ErrorHandler()
@@ -82,9 +73,5 @@ public class CommandListener extends ListenerAdapter {
 
     private void shutdown() {
         Main.api.shutdown();
-    }
-
-    private void reply(SlashCommandInteractionEvent event, String content, boolean ephemeral) {
-        event.reply(content).setEphemeral(ephemeral).queue();
     }
 }

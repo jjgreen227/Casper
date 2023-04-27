@@ -1,7 +1,8 @@
 package dev.casperbot;
 
 import dev.casperbot.database.MySQLConnector;
-import dev.casperbot.database.MySQLFactory;
+import dev.casperbot.database.QueryHandler;
+import dev.casperbot.database.cont.guild.*;
 import dev.casperbot.handlers.AuditLogHandlers;
 import dev.casperbot.listeners.CommandListener;
 import dev.casperbot.listeners.HistoryListener;
@@ -73,7 +74,8 @@ public class Main {
                 username,
                 password));
         connector.connect();
-        MySQLFactory.createTable();
+        QueryHandler.createGuildTable();
+        QueryHandler.createUserTable();
         warning("Attempting to build JDA instance...");
         JDABuilder jdaBuilder = JDABuilder.createDefault(token, Arrays.asList(allIntents));
         jdaBuilder.setActivity(Activity.streaming("IntelliJ Code", "https://www.twitch.tv/jayboy329"));
@@ -92,6 +94,7 @@ public class Main {
         warning("Registering listeners...");
         try {
             builder.addEventListeners(
+                    new CasperGuildListener(),
                     new CommandListener(),
                     new AuditLogHandlers(),
                     new VoiceChannelListener(),
@@ -108,6 +111,8 @@ public class Main {
     private static void registerCommands() {
         warning("Registering Commands...");
         try {
+            var guild = slash("guild", "Guild Information")
+                    .setGuildOnly(true);
             var ping = slash("ping", "Ping");
             var shutdown = slash("shutdown", "Shuts down the bot (hopefully in a fast manner)")
                     .setGuildOnly(true)
@@ -124,6 +129,7 @@ public class Main {
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR));
             var rps = slash("rps", "Rock Paper Scissors...Shoot!");
             api.updateCommands().addCommands(
+                    guild,
                     ping,
                     shutdown,
                     clearchat,

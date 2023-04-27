@@ -11,12 +11,12 @@ public class DiscordUserHandler extends Handler {
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         final Member member = event.getMember();
-        DiscordUser user = new DiscordUser(member.getId(), member.getEffectiveName());
+        CasperUser user = new CasperUser(member.getId(), member.getEffectiveName());
         user.setBanned(false);
         user.setTimed(false);
         user.setRoles(member.getRoles());
         user.setJoinedDate(member.getTimeJoined().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
-        DiscordUserManager manager = DiscordUserManager.getInstance(user);
+        CasperUserManager manager = CasperUserManager.getInstance(user);
         manager.addDiscordUser(user.getId(), user.getName());
     }
 }

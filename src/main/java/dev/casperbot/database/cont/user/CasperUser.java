@@ -12,7 +12,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class DiscordUser {
+public class CasperUser {
 
     private String name;
     private String id;
@@ -20,7 +20,7 @@ public class DiscordUser {
     private boolean isAdmin, isTimed, isBanned;
     private String joinedDate;
 
-    public DiscordUser(String id, String name) {
+    public CasperUser(String id, String name) {
         this.name = name;
         this.id = id;
         this.roles = new ArrayList<>();
@@ -81,7 +81,7 @@ public class DiscordUser {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof final DiscordUser user)) return false;
+        if (!(o instanceof final CasperUser user)) return false;
         return isAdmin() == user.isAdmin() && isTimed() == user.isTimed() && isBanned() == user.isBanned() && Objects.equals(getName(), user.getName()) && Objects.equals(getId(), user.getId()) && Objects.equals(getRoles(), user.getRoles()) && Objects.equals(getJoinedDate(), user.getJoinedDate());
     }
 
