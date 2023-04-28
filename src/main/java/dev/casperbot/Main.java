@@ -87,7 +87,6 @@ public class Main {
         api.awaitReady();
         fine("Successfully built JDA instance.");
         registerCommands();
-        createLogs();
     }
 
     private static void registerListeners(JDABuilder builder) {
@@ -143,31 +142,6 @@ public class Main {
             api.shutdown();
         }
         fine("Successfully registered all commands.");
-    }
-
-    private static void createLogs() {
-        Guild guild = api.getGuildById(CasperConstants.GUILD_ID);
-        try {
-            if (guild == null)
-                throw new GuildNotFoundException("Unable to find guild with ID: " + CasperConstants.GUILD_ID);
-            if (guild.getCategoriesByName("test", true).isEmpty()) {
-                severe("Unable to find support category. Creating category...");
-                guild.createCategory("test").queue();
-                fine("Category has been created.");
-                Thread.sleep(1000);
-                info("Creating channels within category...");
-                guild.getCategoriesByName("test", true).forEach(category -> {
-                    category.createTextChannel("audit-log").setTopic("Logging Moderation Actions.").queue();
-                    category.createTextChannel("changelog").setTopic("Logging GitHub Actions.").queue();
-                });
-                fine("Channels created.");
-            } else {
-                fine("Category exists.");
-            }
-        } catch (GuildNotFoundException | InterruptedException e) {
-            severe("Unable to create channels.");
-            throw new RuntimeException(e);
-        }
     }
 
     public static void main(String[] args) throws SQLException, InterruptedException {

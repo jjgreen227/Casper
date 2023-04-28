@@ -1,5 +1,6 @@
 package dev.casperbot.database.cont.guild;
 
+import dev.casperbot.util.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.*;
 import net.dv8tion.jda.api.hooks.*;
@@ -17,5 +18,32 @@ public class CasperGuildListener extends ListenerAdapter {
         String ownerName = Objects.requireNonNull(guild.getOwner()).getEffectiveName();
         int memberCount = guild.getMemberCount();
         CasperGuildManager.getInstance().addGuild(id, name, ownerId, ownerName, memberCount);
+        CasperConstants.fine("Joined guild " + name + " (" + id + ")");
+        createLogs(guild);
     }
+
+    private void createLogs(Guild guild) {
+        CasperGuild casperGuild = CasperGuildManager.getInstance().getGuild(guild.getId());
+        if (casperGuild == null) return;
+        if (guild.getCategoriesByName("test", true).isEmpty()) {
+            CasperConstants.severe("Unable to find support category. Creating category...");
+            guild.createCategory("test").queue();
+            CasperConstants.fine("Category has been created.");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            CasperConstants.warning("Creating channels within category...");
+            guild.getCategoriesByName("test", true).forEach(category -> {
+                category.createTextChannel("audit-log").setTopic("Logging Moderation Actions.").queue();
+                category.createTextChannel("changelog").setTopic("Logging GitHub Actions.").queue();
+            });
+            CasperConstants.fine("Channels created.");
+        } else {
+            CasperConstants.fine("Category exists.");
+        }
+    }
+
+
 }

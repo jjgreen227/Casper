@@ -18,14 +18,18 @@ public class CasperGuildManager {
 
     public void addGuild(String id, String name, String ownerId, String ownerName, int members) {
         if (this.casperGuildMap.containsKey(id)) return;
-        this.guild = new CasperGuild(id, name, ownerId, ownerName, members);
+        guild = new CasperGuild(id, name, ownerId, ownerName, members);
         QueryHandler.addGuild(id, name, ownerId, ownerName, members);
-        this.casperGuildMap.put(id, this.guild);
+        this.casperGuildMap.put(id, guild);
     }
 
     public CasperGuild getGuild(String id) {
         QueryHandler.getGuildInfo(id);
         return this.casperGuildMap.get(id);
+    }
+
+    public void removeGuild(String id) {
+        this.casperGuildMap.remove(id);
     }
 
     public static CasperGuildManager getInstance() {
