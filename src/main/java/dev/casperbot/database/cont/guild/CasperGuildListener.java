@@ -22,6 +22,15 @@ public class CasperGuildListener extends ListenerAdapter {
         createLogs(guild);
     }
 
+    @Override
+    public void onGuildLeave(GuildLeaveEvent event) {
+        Guild guild = event.getGuild();
+        String id = guild.getId();
+        String name = guild.getName();
+        CasperGuildManager.getInstance().removeGuild(id);
+        CasperConstants.fine("Left guild " + name + " (" + id + ")");
+    }
+
     private void createLogs(Guild guild) {
         CasperGuild casperGuild = CasperGuildManager.getInstance().getGuild(guild.getId());
         if (casperGuild == null) return;
